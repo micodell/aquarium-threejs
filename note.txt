@@ -1,0 +1,21 @@
+Source models:
+- weeping_angel: https://sketchfab.com/3d-models/weeping-angel-2740584193a248a098bfc78838e8a5f5
+- paper_plane: https://sketchfab.com/3d-models/paper-plane-77a7e55aa20f4b6594ca385c7dcbeeaf
+- horror_corridor_1: https://sketchfab.com/3d-models/horror-corridor-1-09b4d35847db449bbfa89a84087a8932
+
+Docs:
+- GSAP: https://gsap.com/docs/v3/GSAP
+
+Penilaian:
+I. Camera
+- Zoom in/out
+- Rotate tilt (Roll, Pitch, Yaw)
+- Collision
+- Cinematography
+
+II. Lighting
+- Ambient diffuse specular
+- Shadow
+- Transparency
+- Setting lighting sesuai tema: abu2 pudar..
+- Environment 
