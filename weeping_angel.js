@@ -25,7 +25,7 @@ controls.minDistance = 1;
 controls.maxDistance = 25;
 
 // 1. Define the Target (Where the camera looks)
-const target = new THREE.Vector3(-30, 4, 0);
+const target = new THREE.Vector3(-30, 4, 6);
 controls.target.copy(target);
 
 // 2. Calculate Camera Position for 90-degree start
@@ -100,7 +100,7 @@ function startCinematicSequence(targetZ) {
     const tl = gsap.timeline({ repeat: -1, yoyo: true });
 
     // tl.to(camera.position, {
-    //     z: targetZ,
+    //     z: -targetZ,
     //     duration: 10,
     //     ease: "power1.inOut"
     // });

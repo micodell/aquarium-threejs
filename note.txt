@@ -5,6 +5,7 @@ Source models:
 
 Docs:
 - GSAP: https://gsap.com/docs/v3/GSAP
+- https://discourse.threejs.org/t/how-to-animate-a-threejs-object-using-gsap/36225
 
 Penilaian:
 I. Camera
