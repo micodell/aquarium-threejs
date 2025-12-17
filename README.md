@@ -1,4 +1,4 @@
-## How To Run
+## Aquarium using ThreeJS and GSAP
+### How To Run
 - Run the `index.html`
-- Use `WASD` keys to walk
-- Use `arrow` keys to turn around
+- Controls just using mouse, no keys

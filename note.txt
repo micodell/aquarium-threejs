@@ -2,6 +2,7 @@ Source models:
 - weeping_angel: https://sketchfab.com/3d-models/weeping-angel-2740584193a248a098bfc78838e8a5f5
 - paper_plane: https://sketchfab.com/3d-models/paper-plane-77a7e55aa20f4b6594ca385c7dcbeeaf
 - horror_corridor_1: https://sketchfab.com/3d-models/horror-corridor-1-09b4d35847db449bbfa89a84087a8932
+- room aquarium: https://sketchfab.com/3d-models/room-aquarium-now-animated-3d2177c3e90a4379b3484d811c013284
 
 Docs:
 - GSAP: https://gsap.com/docs/v3/GSAP
@@ -20,3 +21,11 @@ II. Lighting
 - Transparency
 - Setting lighting sesuai tema: abu2 pudar..
 - Environment 
+
+x kanan/kiri
+y tinggi/rendah
+z maju/mundur
+
+y_pos: turun (-), naik (+)
+
+x_rot: oleng L/R
