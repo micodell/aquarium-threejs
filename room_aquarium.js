@@ -57,12 +57,51 @@ camera.position.z = target.z;
 controls.update();
 
 // --- !! LIGHTS !! ---
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Soft white light
+const ambientLight = new THREE.AmbientLight(0x1a2a33, 0.5); // Soft black light
 scene.add(ambientLight);
 
+// Directional Light (Buat cahaya besar dari depan kaca)
 const dirLight = new THREE.DirectionalLight(0xffffff, 2); // Increase intensity to 2
-dirLight.position.set(5, 10, 5); // Move it higher up
+dirLight.position.set(0, 20, 60); // Cahaya dari kaca depan aquarium
+dirLight.target.position.set(0, 2, -20); // Pointing to inside the aquarium
 dirLight.castShadow = true; // <--- LIGHT MUST CAST SHADOW
+// const helper = new THREE.DirectionalLightHelper( dirLight, 20 );
+// scene.add( helper );
+
+// SpotLight (Buat cahaya dari atas aquarium)
+const spotLight = new THREE.SpotLight(
+    0xaadfff,   // warna kebiruan (air friendly)
+    15,          // intensity (cukup terang)
+    30,         // distance
+    THREE.MathUtils.degToRad(60), // sudut cone
+    0.4,        // penumbra (soft edge)
+    2           // decay (realistic falloff)
+);
+
+// POSISI DI LUAR AQUARIUM
+spotLight.position.set(0, 30, -30);
+
+// TARGET KE DALAM AQUARIUM
+spotLight.target.position.set(0, 2, -20);
+
+// SHADOW SETTINGS
+spotLight.castShadow = true;
+spotLight.shadow.mapSize.width = 2048;
+spotLight.shadow.mapSize.height = 2048;
+spotLight.shadow.camera.near = 1;
+spotLight.shadow.camera.far = 40;
+spotLight.shadow.focus = 1;
+const helper = new THREE.DirectionalLightHelper( spotLight, 20 );
+scene.add( helper );
+
+const s = 15;
+spotLight.shadow.camera.left = -s;
+spotLight.shadow.camera.right = s;
+spotLight.shadow.camera.top = s;
+spotLight.shadow.camera.bottom = -s;
+
+scene.add(spotLight);
+scene.add(spotLight.target);
 
 // FIX SHADOW QUALITY (Defaults are pixelated and small)
 dirLight.shadow.mapSize.width = 2048; // Higher res shadows
