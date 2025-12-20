@@ -188,36 +188,30 @@ function startFishSequence() {
         ease: "power1.inOut"
     });
     // back to center
-    tl.to(camera.rotation, {
-        y: y_rot +0,
-        duration: 4,
-        ease: "power1.inOut"
-    });
+    // tl.to(camera.rotation, {
+    //     y: y_rot +0,
+    //     duration: 4,
+    //     ease: "power1.inOut"
+    // });
     // to right
-    tl.to(camera.rotation, {
-        y: y_rot -1, // right
+    // tl.to(camera.rotation, {
+    //     y: y_rot -1, // right
+    //     duration: 4,
+    //     ease: "power1.inOut"
+    // });
+
+
+    // zoom-in, zoom-out
+    tl.to(camera.position, {
+        z: z_pos -10, // zoom-in
         duration: 4,
-        ease: "power1.inOut"
+        ease: "power2.out"
     });
-
-    // // ndangak
-    // tl.to(camera.position, {
-    //     z: z_pos +1.5, // up
-    //     duration: 4,
-    //     ease: "power2.inOut"
-    // });
-
-    // // zoom-in, zoom-out
-    // tl.to(camera.position, {
-    //     z: z_pos +10, // zoom-in
-    //     duration: 4,
-    //     ease: "power2.out"
-    // });
-    // tl.to(camera.position, {
-    //     z: z_pos +10, // zoom-out
-    //     duration: 4,
-    //     ease: "power2.inOut"
-    // });
+    tl.to(camera.position, {
+        z: z_pos +10, // zoom-out
+        duration: 4,
+        ease: "power2.inOut"
+    });
 
     // swim (loop)
     tl.call(startSwimmingLoop);
