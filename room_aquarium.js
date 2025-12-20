@@ -349,10 +349,10 @@ function startFishSequence() {
         repeat: 6,
         ease: "sine.inOut"
     });
-    camState.y -= 10; // down
+    camState.y -= 2; // down
     tl.to(camera.position, {
         y: camState.y,
-        duration: 1,
+        duration: 2,
         ease: "power1.inOut"
     });
     tl.to(camera.position, { // break sebentar
@@ -506,7 +506,7 @@ function startFishSequence() {
 
     
     // swim (loop)
-    tl.call(startSwimmingLoop);
+    // tl.call(startSwimmingLoop);
 }
 
 function startSwimmingLoop() {
