@@ -13,6 +13,7 @@ const clock = new THREE.Clock();
 let mixer;
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.rotation.order = 'YXZ';
 
 // --- RENDERER SETTINGS ---
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -46,7 +47,6 @@ controls.target.copy(target);
 
 // 2. Calculate Camera Position for 90-degree start
 // We position the camera relative to the target
-const distance = 15; // How far away from the target
 const angle = Math.PI; // 90 degrees in Radians
 
 // Math to place camera in a circle around the target
@@ -220,63 +220,179 @@ aquariumLoader.load('models/room_aquarium_now_animated.glb', (gltf) => {
 
 // 3. GSAP Logic
 // Set Initial Position (High above the tank)
-var x_pos = 10, y_pos = 20, z_pos = 40;
-camera.position.set(x_pos, y_pos, z_pos); 
-var x_rot = 0, y_rot = 6.2, z_rot = 0;
-camera.rotation.set(x_rot, y_rot, z_rot);
+const camState = {
+    x: 10,
+    y: 20,
+    z: 40,
+    rotX: -1,
+    rotY: 6.2,
+    rotZ: 0
+};
+camera.position.set(camState.x, camState.y, camState.z); 
+camera.rotation.set(camState.rotX, camState.rotY, camState.rotZ);
+var distance = 0;
+
 
 function startFishSequence() {
     const tl = gsap.timeline();
+
+    function calculateForwardMove(distance) {
+        camState.x -= distance * Math.sin(camState.rotY);
+        camState.z -= distance * Math.cos(camState.rotY);
+    }
 
     // guide:
     // x kanan/kiri
     // y tinggi/rendah
     // z maju/mundur
 
+    // fase 0: dituang dari atas aquarium
     // the drop from above the aquarium to inside
+    camState.y -= 60
     tl.to(camera.position, {
-        y: y_pos +2,
+        y: camState.y,
         duration: 2,
-        ease: "bounce.out"
+        ease: "bounce(0.5)"
     });
-
-    // tolah-toleh like confused
+    camState.rotX += 1; // up
     tl.to(camera.rotation, {
-        y: y_rot +1, // left
-        duration: 4,
-        ease: "power1.inOut"
-    });
-    tl.to(camera.rotation, {
-        y: y_rot -1, // right
-        duration: 4,
-        ease: "power1.inOut"
-    });
-    // back to center
-    // tl.to(camera.rotation, {
-    //     y: y_rot +0,
-    //     duration: 4,
-    //     ease: "power1.inOut"
-    // });
-    // to right
-    // tl.to(camera.rotation, {
-    //     y: y_rot -1, // right
-    //     duration: 4,
-    //     ease: "power1.inOut"
-    // });
-
-
-    // zoom-in, zoom-out
-    tl.to(camera.position, {
-        z: z_pos -10, // zoom-in
-        duration: 4,
-        ease: "power2.out"
-    });
-    tl.to(camera.position, {
-        z: z_pos +10, // zoom-out
-        duration: 4,
+        x: camState.rotX,
+        y: camState.rotY,
+        z: 0,
+        duration: 2,
         ease: "power2.inOut"
     });
 
+    // fase 1: bingung, mengenali env sekitarnya
+    camState.rotX += 0.5; // up
+    tl.to(camera.rotation, {
+        x: camState.rotX,
+        y: camState.rotY,
+        z: 0,
+        duration: 2,
+        ease: "power2.inOut"
+    });
+    camState.rotY += 1; // left
+    tl.to(camera.rotation, {
+        y: camState.rotY,
+        duration: 2,
+        ease: "power1.inOut"
+    });
+    camState.rotY -= 0.5; // right
+    tl.to(camera.rotation, {
+        y: camState.rotY,
+        duration: 2,
+        ease: "power1.inOut"
+    });
+    camState.rotY -= 1.6; // right
+    tl.to(camera.rotation, {
+        y: camState.rotY,
+        duration: 2,
+        ease: "power1.inOut"
+    });
+
+
+    // fase 2: melihat makanan (up then zoom), go there, eat
+    camState.rotX += 0.4; // up
+    tl.to(camera.rotation, {
+        x: camState.rotX,
+        y: camState.rotY,
+        z: 0,
+        duration: 2,
+        ease: "power2.inOut"
+    });
+    tl.to(camera, {
+        fov: 10, // zoom-in
+        duration: 3,
+        ease: "power3.out",
+        onUpdate: () => camera.updateProjectionMatrix()
+    });
+    tl.to(camera, {
+        fov: 75, // zoom-out
+        duration: 3,
+        ease: "power2.inOut",
+        onUpdate: () => camera.updateProjectionMatrix()
+    });
+
+    distance = 77;
+    camState.y += distance;
+    camState.x -= 0 + (45 * Math.sin(camState.rotY));
+    camState.z -= -5 + (45 * Math.cos(camState.rotY));
+    camState.rotX -= 0.4; // down
+    tl.to(camera.position, {
+        x: camState.x,
+        y: camState.y,
+        z: camState.z,
+        duration: 8,
+        ease: "power1.inOut"
+    }).to(camera.rotation, {
+        x: camState.rotX,
+        y: camState.rotY,
+        z: 0,
+        duration: 8,
+        ease: "power1.inOut",
+    }, "<");
+
+    tl.to(camera.position, { // break sebentar
+        x: camState.x,
+        y: camState.y,
+        z: camState.z,
+        duration: 1,
+        ease: "power1.inOut"
+    });
+    tl.to(camera.rotation, {
+        x: "+=0.2", // eat: up and down
+        duration: 0.2,
+        yoyo: true,
+        repeat: 7,
+        ease: "sine.inOut"
+    });
+    tl.to(camera.position, { // break sebentar
+        x: camState.x,
+        y: camState.y,
+        z: camState.z,
+        duration: 1,
+        ease: "power1.inOut"
+    });
+
+
+    // fase 3: selesai makan, turun
+    calculateForwardMove(distance);
+    camState.rotX -= 2; // down
+    camState.rotY += 2.5; // left sampai balik 180
+    tl.to(camera.rotation, {
+        x: camState.rotX,
+        y: camState.rotY,
+        z: 0,
+        duration: 2,
+        ease: "power2.inOut"
+    });
+    distance = 30;
+    camState.y -= distance;
+    camState.x -= 4 + (45 * Math.sin(camState.rotY));
+    camState.z -= 4 + (45 * Math.cos(camState.rotY));
+    camState.rotX += 1.2; // up
+    tl.to(camera.position, {
+        y: camState.y,
+        duration: 3,
+        ease: "power1.inOut"
+    }).to(camera.rotation, {
+        x: camState.rotX,
+        // y: camState.rotY,
+        z: 0,
+        duration: 3,
+        ease: "power1.inOut",
+    }, "<");
+    distance = 30;
+    calculateForwardMove(distance);
+    camState.x -= distance;
+    tl.to(camera.position, {
+        x: camState.x,
+        duration: 3,
+        ease: "power1.inOut"
+    });
+
+    
     // swim (loop)
     tl.call(startSwimmingLoop);
 }
@@ -284,20 +400,21 @@ function startFishSequence() {
 function startSwimmingLoop() {
     const swimTl = gsap.timeline({ repeat: -1, yoyo: true });
     // swim
+    camState.x -= 50
     swimTl.to(camera.position, {
-        z: z_pos -50, 
+        x: camState.x, 
         duration: 10,
         ease: "strong.inOut"
     });
 
     const wiggleTl = gsap.timeline({ repeat: -1, yoyo: true });
     wiggleTl.to(camera.rotation, {
-        y: y_rot +0.02, // slight left
+        y: camState.rotY +0.02, // slight left
         duration: 1,
         ease: "sine.inOut"
     });
     wiggleTl.to(camera.rotation, {
-        y: y_rot -0.02, // slight right
+        y: camState.rotY -0.02, // slight right
         duration: 1,
         ease: "sine.inOut"
     });
@@ -350,6 +467,11 @@ function animate() {
     if (mixer) {
         mixer.update(delta);
     }
+
+    const forward = new THREE.Vector3();
+    camera.getWorldDirection(forward);
+    controls.target.copy(camera.position).add(forward.multiplyScalar(10));
+
     // updateMovement();
     // controls.update();
     renderer.render(scene, camera);

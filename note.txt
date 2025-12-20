@@ -4,14 +4,16 @@ Source models:
 - horror_corridor_1: https://sketchfab.com/3d-models/horror-corridor-1-09b4d35847db449bbfa89a84087a8932
 - room aquarium: https://sketchfab.com/3d-models/room-aquarium-now-animated-3d2177c3e90a4379b3484d811c013284
 
-Docs:
+Docs & learning resources:
 - GSAP: https://gsap.com/docs/v3/GSAP
 - https://discourse.threejs.org/t/how-to-animate-a-threejs-object-using-gsap/36225
+- https://howthingsfly.si.edu/flight-dynamics/roll-pitch-and-yaw
+- https://mecharithm.com/learning/lesson/explicit-representations-orientation-robotics-roll-pitch-yaw-angles-15
 
 Penilaian:
 I. Camera
 - Zoom in/out
-- Rotate tilt (Roll, Pitch, Yaw)
+- Rotate tilt (Roll(Z), Pitch(X), Yaw(Y))
 - Collision
 - Cinematography
 
@@ -22,10 +24,19 @@ II. Lighting
 - Setting lighting sesuai tema: abu2 pudar..
 - Environment 
 
+Inspirasi aquarium: https://vt.tiktok.com/ZSPf7QXnf/
+
+position:
 x kanan/kiri
 y tinggi/rendah
 z maju/mundur
 
-y_pos: turun (-), naik (+)
+rotation:
+x up/down
+y left/right
+z tilt
 
+y_pos: turun (-), naik (+)
 x_rot: oleng L/R
+
+x_rot, z_rot: look down/up
