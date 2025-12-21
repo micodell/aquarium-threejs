@@ -57,11 +57,11 @@ camera.position.z = target.z;
 controls.update();
 
 // --- !! LIGHTS !! ---
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Soft black light
+const ambientLight = new THREE.AmbientLight(0x3d85c6, 0.15); // Soft black light
 scene.add(ambientLight);
 
 // Directional Light (Buat cahaya besar dari depan kaca)
-const dirLight = new THREE.DirectionalLight(0xffffff, 1); // Increase intensity to 2
+const dirLight = new THREE.DirectionalLight(0x9fc5e8, 1); // Increase intensity to 2
 dirLight.position.set(0, 20, 60); // Cahaya dari kaca depan aquarium
 dirLight.target.position.set(0, 2, -20); // Pointing to inside the aquarium
 dirLight.castShadow = true; // <--- LIGHT MUST CAST SHADOW
@@ -70,16 +70,16 @@ dirLight.castShadow = true; // <--- LIGHT MUST CAST SHADOW
 
 // SpotLight (Buat cahaya dari atas aquarium)
 const spotLight = new THREE.SpotLight(
-    0x8ae1ff,   // warna kebiruan (air friendly)
+    0x8fdcff,   // warna kebiruan (air friendly)
     100,          // intensity (cukup terang)
-    100,         // distance
-    THREE.MathUtils.degToRad(60), // sudut cone
-    0.3,        // penumbra (soft edge)
+    120,         // distance
+    THREE.MathUtils.degToRad(70), // sudut cone
+    0.6,        // penumbra (soft edge)
     1           // decay (realistic falloff)
 );
 
 // POSISI DI LUAR AQUARIUM
-spotLight.position.set(0, 35, -30);
+spotLight.position.set(0, 40, -30);
 
 // TARGET KE DALAM AQUARIUM
 spotLight.target.position.set(0, 2, -20);
@@ -87,9 +87,9 @@ spotLight.target.position.set(0, 2, -20);
 // SHADOW SETTINGS
 spotLight.castShadow = true;
 spotLight.shadow.mapSize.set(2048, 2048);
-spotLight.shadow.camera.near = 1;
-spotLight.shadow.camera.far = 100;
-// spotLight.shadow.focus = 1;
+spotLight.shadow.camera.near = 10;
+spotLight.shadow.camera.far = 120;
+spotLight.shadow.bias = -0.0005; // Reduce shadow acne
 const spothelper = new THREE.DirectionalLightHelper( spotLight, 20 );
 scene.add( spothelper );
 
@@ -123,8 +123,8 @@ spotLight2.shadow.mapSize.set(2048, 2048);
 spotLight2.shadow.camera.near = 1;
 spotLight2.shadow.camera.far = 100;
 // spotLight2.shadow.focus = 1;
-const spothelper2 = new THREE.DirectionalLightHelper( spotLight2, 20 );
-scene.add( spothelper2 );
+// const spothelper2 = new THREE.DirectionalLightHelper( spotLight2, 20 );
+// scene.add( spothelper2 );
 
 const s2 = 15;
 spotLight2.shadow.camera.left = -s2;
@@ -132,8 +132,9 @@ spotLight2.shadow.camera.right = s2;
 spotLight2.shadow.camera.top = s2;
 spotLight2.shadow.camera.bottom = -s2;
 
-scene.add(spotLight2);
-scene.add(spotLight2.target);
+// Ga pake
+// scene.add(spotLight2);
+// scene.add(spotLight2.target);
 
 const spotLight3 = new THREE.SpotLight(
     0x8ae1ff,   // warna kebiruan (air friendly)
@@ -156,16 +157,17 @@ spotLight3.shadow.mapSize.set(2048, 2048);
 spotLight3.shadow.camera.near = 1;
 spotLight3.shadow.camera.far = 100;
 // spotLight3.shadow.focus = 1;
-const spothelper3 = new THREE.DirectionalLightHelper( spotLight3, 20 );
-scene.add( spothelper3 );
+// const spothelper3 = new THREE.DirectionalLightHelper( spotLight3, 20 );
+// scene.add( spothelper3 );
 
 const s3 = 15;
 spotLight3.shadow.camera.left = -s3;
 spotLight3.shadow.camera.right = s3;
 spotLight3.shadow.camera.top = s3;
 spotLight3.shadow.camera.bottom = -s3;
-scene.add(spotLight3);
-scene.add(spotLight3.target);
+// Ga pake
+// scene.add(spotLight3);
+// scene.add(spotLight3.target);
 
 // FIX SHADOW QUALITY (Defaults are pixelated and small)
 dirLight.shadow.mapSize.width = 2048; // Higher res shadows
@@ -182,9 +184,29 @@ dirLight.shadow.camera.bottom = -d;
 
 scene.add(dirLight);
 
-const centerLight = new THREE.PointLight(0xff0000, 1, 10); // Red light, intensity 1, range 10m
-centerLight.position.set(0, 2, 0); // Hanging 2 meters in the air
-scene.add(centerLight);
+// const centerLight = new THREE.PointLight(0xff0000, 1, 10); // Red light, intensity 1, range 10m
+// centerLight.position.set(0, 2, 0); // Hanging 2 meters in the air
+// scene.add(centerLight);
+
+scene.fog = new THREE.Fog(
+    0x0b1e2d,  // warna air gelap
+    -30,        // mulai
+    150         // habis
+);
+
+// Glow
+const glowGeo = new THREE.PlaneGeometry(30, 4);
+const glowMat = new THREE.MeshBasicMaterial({
+    color: 0x8fdcff,
+    transparent: true,
+    opacity: 90
+});
+
+const glow = new THREE.Mesh(glowGeo, glowMat);
+glow.position.set(0, 43, 0);
+glow.rotation.x = Math.PI / 2;
+scene.add(glow);
+
 
 // 2. Load GLBs
 const aquariumLoader = new GLTFLoader();
