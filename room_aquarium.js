@@ -8,7 +8,8 @@ RectAreaLightUniformsLib.init();
 
 // 1. Setup Scene and Clock for animation :)
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x111111); 
+scene.background = new THREE.Color(0x111122);
+scene.fog = new THREE.Fog(0x001e0f, 0.1, 800); // Color, Near, Far
 
 const clock = new THREE.Clock();
 let mixer;
@@ -816,7 +817,7 @@ window.addEventListener('keyup', (event) => {
 function updateMovement() {
     const forward = new THREE.Vector3();
     camera.getWorldDirection(forward);
-    forward.y = 0;
+    // forward.y = 0;
     forward.normalize();
 
     const right = new THREE.Vector3();
