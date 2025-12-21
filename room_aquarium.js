@@ -796,15 +796,64 @@ function startFishSequence() {
         x: camState.x,
         // y: camState.y,
         z: camState.z,
-        duration: 8,
+        duration: 7,
         ease: "power1.inOut"
     }).to(camera.rotation, {
         // x: camState.rotX,
         y: camState.rotY,
         z: 0,
-        duration: 8,
+        duration: 7,
         ease: "power1.inOut",
     }, "<");
+
+
+    // --- FASE 6: EXIT & ORBIT (New) ---
+
+    // 1. Zoom Out (Escape the tank)
+    // Pull camera up and back to see the whole tank
+    camState.x = 0; // Center X relative to tank
+    camState.y = 40; // High up (above the water/room)
+    camState.z = 200; // Far back
+    camState.rotX = -0.3; // Look down slightly
+    camState.rotY = 0;    // Reset rotation to look forward
+    camState.rotZ = 0;    // Reset roll
+
+    tl.to(camera.position, {
+        x: camState.x,
+        y: camState.y,
+        z: camState.z,
+        duration: 5,
+        ease: "power2.inOut",
+        onstart: () => {
+            scene.fog = null;
+        }
+    }).to(camera.rotation, {
+        x: camState.rotX,
+        y: camState.rotY,
+        z: camState.rotZ,
+        duration: 5,
+        ease: "power2.inOut"
+    }, "<"); // Run at same time as position move
+
+    // 2. Circle Around the Aquarium (Orbit)
+    // We animate a 'dummy' object (angle) from 0 to 360 (2*Math.PI)
+    // and calculate X/Z positions in the onUpdate function.
+    const orbit = { angle: 0 };
+    const radius = 200; // Distance from center
+
+    tl.to(orbit, {
+        angle: Math.PI * 2, // Full 360 circle
+        duration: 15,       // Slow rotation
+        ease: "none",       // Constant speed
+        onUpdate: function() {
+            // Calculate circular path
+            camera.position.x = radius * Math.sin(orbit.angle);
+            camera.position.z = radius * Math.cos(orbit.angle);
+
+            // Force camera to look at center (0,0,0)
+            camera.lookAt(0, 0, 0);
+        }
+    });
 
     
     // swim (loop)
