@@ -16,6 +16,7 @@ let mixer;
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
 camera.rotation.order = 'YXZ';
+const cameraSphere = new THREE.Sphere(camera.position, 2);
 
 // --- RENDERER SETTINGS ---
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -422,6 +423,8 @@ roomLoader.load('models/living_roomkitchenbedroom.glb', (gltf) => {
 });
 
 const aquariumLoader = new GLTFLoader();
+let hitboxAquariumRight;
+const rightWallHitbox = new THREE.Box3();
 aquariumLoader.load('models/room_aquarium_now_animated.glb', (gltf) => {
     const aquarium = gltf.scene;
     aquarium.position.set(0, 0, 0);
@@ -430,7 +433,7 @@ aquariumLoader.load('models/room_aquarium_now_animated.glb', (gltf) => {
     aquarium.traverse((node) => {
         if (node.isMesh) {
             
-            console.log(node.name);
+            // console.log(node.name);
 
             if (node.name.toLowerCase().includes('bubles')) {
                 node.material.transparent = true;
@@ -505,11 +508,25 @@ aquariumLoader.load('models/room_aquarium_now_animated.glb', (gltf) => {
         action.play();
     }
 
+    const hitboxGeometry = new THREE.BoxGeometry(2, 100, 100);
+    const hitboxMaterial = new THREE.MeshBasicMaterial({
+        color: 0xff0000,
+        wireframe: false,
+        transparent: true,
+        opacity: 0
+    });
+    hitboxAquariumRight = new THREE.Mesh(hitboxGeometry, hitboxMaterial);
+    hitboxAquariumRight.position.set(100, 0, 0);
+
+    aquarium.add(hitboxAquariumRight);
+
     startFishSequence();
 
 }, undefined, (error) => {
     console.error('Error loading aquarium:', error);
 });
+
+
 
 // camera.position.set(0, 0, 0);
 
@@ -523,6 +540,15 @@ audioLoader.load('./media/water-submerge-sound-effect.mp3', function(buffer) {
     splashSound.setBuffer(buffer);
     splashSound.setLoop(false);
     splashSound.setVolume(3.0);
+});
+
+// --- SOUND EFFECT: COLLISION (THUCK) ---
+const thuckSound = new THREE.Audio(listener);
+const audioLoaderThuck = new THREE.AudioLoader();
+audioLoaderThuck.load('./media/glass_thud.mp3', function(buffer) {
+    thuckSound.setBuffer(buffer);
+    thuckSound.setVolume(1.0); // Adjust volume
+    thuckSound.setLoop(false);
 });
 
 // 3. GSAP Logic
@@ -812,25 +838,66 @@ function startFishSequence() {
         ease: "power1.inOut",
     });
 
-    // fase 5: swim
+    // --- FASE 5: SWIM TO WALL (HITBOX) ---
     distance = 30;
-    camState.x += distance;
+
+    // Simpan posisi saat ini (untuk titik balik nanti)
+    const startX = camState.x;
+    const startZ = camState.z;
+    const startRotY = camState.rotY;
+
+    // Hitung posisi target (Dinding)
+    camState.x += distance * 4;
+    camState.y -= 10
     camState.z -= -5 + (45 * Math.cos(camState.rotY));
-    camState.rotX -= 0.8; // down
-    calculateForwardMove(distance);
+    camState.rotX -= 0.8; // look down
+
     tl.to(camera.position, {
         x: camState.x,
-        // y: camState.y,
+        y: camState.y,
         z: camState.z,
-        duration: 7,
-        ease: "power1.inOut"
+        duration: 5, // Durasi maju sampai nabrak
+        ease: "power1.in", // Aksen: Semakin cepat saat mendekati dinding
+        onComplete: () => {
+            // Efek Suara Tabrakan
+            if (typeof thuckSound !== 'undefined' && !thuckSound.isPlaying) {
+                thuckSound.play();
+            }
+        }
     }).to(camera.rotation, {
-        // x: camState.rotX,
+        x: camState.rotX,
         y: camState.rotY,
         z: 0,
-        duration: 7,
-        ease: "power1.inOut",
+        duration: 5,
+        ease: "power1.in",
     }, "<");
+
+
+    // --- FASE 5.5: ROTATE & GO BACK (NEW) ---
+
+    // 1. Setup Variabel untuk Balik Arah
+    camState.x = startX / 2;
+    camState.z = startZ / 2;
+
+    // 2. Putar Badan 180 Derajat (Balik Kanan)
+    camState.rotY += Math.PI; // Tambah 180 derajat (3.14 radian)
+    camState.rotX += 0.8;     // Kembali melihat lurus (undo look down)
+
+    // 3. Animasi Putar Balik (Bouncing effect setelah nabrak)
+    tl.to(camera.rotation, {
+        y: camState.rotY,
+        x: camState.rotX,
+        duration: 1.5,
+        ease: "back.out(1.5)" // Efek mental sedikit saat putar
+    });
+
+    // 4. Berenang Kembali ke Posisi Awal
+    tl.to(camera.position, {
+        x: camState.x,
+        z: camState.z,
+        duration: 6,
+        ease: "power1.out" // Melambat saat sampai
+    });
 
 
     // --- FASE 6: EXIT & ORBIT (New) ---
@@ -854,7 +921,7 @@ function startFishSequence() {
         x: camState.x,
         y: camState.y,
         z: camState.z,
-        duration: 5,
+        duration: 4,
         ease: "power2.inOut",
         onstart: () => {
             scene.fog = null;
@@ -877,7 +944,7 @@ function startFishSequence() {
             // Force camera to look at center (0,0,0)
             camera.lookAt(0, 0, 0);
         }
-    }, "<"); // Run at same time as position move
+    });
 
     tl.to(camera, {
         fov: 60, // zoom-in
@@ -971,6 +1038,33 @@ function animate() {
     // updateMovement();
 
     // controls.update();
+
+    // --- COLLISION CHECK ---
+    // update hitbox position
+    rightWallHitbox.setFromObject(hitboxAquariumRight);
+    if (hitboxAquariumRight) {
+        rightWallHitbox.setFromObject(hitboxAquariumRight);
+        cameraSphere.center.copy(camera.position);
+        if (rightWallHitbox.intersectsSphere(cameraSphere)) {
+
+            console.log("Collision Detected!");
+
+            // 1. Play Sound
+            if (thuckSound && !thuckSound.isPlaying) {
+                thuckSound.play();
+            }
+
+            // 2. Bounce Back Logic
+            const pushVector = new THREE.Vector3();
+            pushVector.subVectors(camera.position, hitboxAquariumRight.position).normalize();
+
+            // Push back by a small amount
+            const pushDistance = 1;
+            camera.position.addScaledVector(pushVector, pushDistance);
+            controls.target.addScaledVector(pushVector, pushDistance);
+        }
+    }
+
     renderer.render(scene, camera);
 }
 animate();
