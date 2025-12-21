@@ -487,6 +487,18 @@ aquariumLoader.load('models/room_aquarium_now_animated.glb', (gltf) => {
 
 // camera.position.set(0, 0, 0);
 
+// Audio: Sound Effect
+const listener = new THREE.AudioListener();
+camera.add(listener);
+
+const splashSound = new THREE.Audio(listener);
+const audioLoader = new THREE.AudioLoader();
+audioLoader.load('./media/water-submerge-sound-effect.mp3', function(buffer) {
+    splashSound.setBuffer(buffer);
+    splashSound.setLoop(false);
+    splashSound.setVolume(3.0);
+});
+
 // 3. GSAP Logic
 // Set Initial Position (High above the tank)
 const camState = {
@@ -503,6 +515,21 @@ var distance = 0;
 
 
 function startFishSequence() {
+    // Audio: BGM
+    const bgm = document.getElementById('bgm');
+    if (bgm) {
+        bgm.volume = 0.3;
+
+        if (bgm.paused) {
+            bgm.play().catch((error) => {
+                console.warn("Autoplay dicegah browser, user harus interaksi dulu:", error);
+            });
+        }
+    }
+    if (listener.context.state === 'suspended') {
+        listener.context.resume();
+    }
+
     const tl = gsap.timeline();
 
     function calculateForwardMove(distance) {
@@ -523,6 +550,12 @@ function startFishSequence() {
         duration: 2,
         ease: "bounce(0.5)"
     });
+    tl.call(() => {
+        if (splashSound.buffer) {
+            if (splashSound.isPlaying) splashSound.stop();
+            splashSound.play(); // splash submerge sound effect
+        }
+    }, null, "<+0.3");
     camState.rotX += 1; // up
     tl.to(camera.rotation, {
         x: camState.rotX,
@@ -855,9 +888,9 @@ function animate() {
     camera.getWorldDirection(forward);
     controls.target.copy(camera.position).add(forward.multiplyScalar(10));
 
-    updateMovement();
+    // updateMovement();
 
-    controls.update();
+    // controls.update();
     renderer.render(scene, camera);
 }
 animate();
