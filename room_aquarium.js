@@ -184,9 +184,12 @@ dirLight.shadow.camera.bottom = -d;
 
 scene.add(dirLight);
 
-// const centerLight = new THREE.PointLight(0xff0000, 1, 10); // Red light, intensity 1, range 10m
-// centerLight.position.set(0, 2, 0); // Hanging 2 meters in the air
-// scene.add(centerLight);
+const centerLight = new THREE.PointLight(0xffffff, 150, 240); // White light, intensity 1, range 10m
+centerLight.position.set(-60, -20, -10); // Hanging 2 meters in the air
+scene.add(centerLight);
+// helper
+const pointLightHelper = new THREE.PointLightHelper(centerLight, 5);
+scene.add(pointLightHelper);
 
 scene.fog = new THREE.Fog(
     0x0b1e2d,  // warna air gelap
