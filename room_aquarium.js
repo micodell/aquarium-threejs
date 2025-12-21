@@ -327,12 +327,10 @@ scene.add(glow);
 //
 //
 // // --- GLASS DOOR LIGHT (SUN) ---
-// // 0xffdfba is a warm sunlight color
 // const sunLight = new THREE.DirectionalLight(0xffdfba, 1);
 //
-// // Position: Outside the room (e.g., x=50), shining in
 // sunLight.position.set(100, 100, 800);
-// sunLight.target.position.set(0, 0, 0); // Points to center of room
+// sunLight.target.position.set(0, 0, 0);
 //
 // sunLight.castShadow = true;
 //
@@ -357,48 +355,39 @@ scene.add(glow);
 // scene.add(sunHelper);
 
 // --- CEILING LAMP 1 ---
-// 0xffffee is a soft indoor warm white
-const ceilingLight1 = new THREE.PointLight(0xffffee, 1000, 1000); // Lower intensity needed now
+const ceilingLight1 = new THREE.PointLight(0xffffee, 1000, 1000);
 ceilingLight1.position.set(450, 280, -80);
-ceilingLight1.decay = 1; // <--- ADD THIS (Default is 2)
-ceilingLight1.distance = 1000; // Limits how far it goes
+ceilingLight1.decay = 1;
+ceilingLight1.distance = 1000;
 
-// Soften shadows for indoor lights
 ceilingLight1.shadow.radius = 4; // Makes shadow edges blurry/soft
 scene.add(ceilingLight1);
 
-// // The number '1' is the size of the sphere
 // const lampHelper1 = new THREE.PointLightHelper(ceilingLight1, 10);
 // scene.add(lampHelper1);
 
 
 // --- CEILING LAMP 2 ---
-// 0xffffee is a soft indoor warm white
-const ceilingLight2 = new THREE.PointLight(0xffffee, 1000, 1000); // Lower intensity needed now
+const ceilingLight2 = new THREE.PointLight(0xffffee, 1000, 1000);
 ceilingLight2.position.set(1800, 200, -120);
-ceilingLight2.decay = 1; // <--- ADD THIS (Default is 2)
-ceilingLight2.distance = 1000; // Limits how far it goes
+ceilingLight2.decay = 1;
+ceilingLight2.distance = 1000;
 
-// Soften shadows for indoor lights
-ceilingLight2.shadow.radius = 4; // Makes shadow edges blurry/soft
+ceilingLight2.shadow.radius = 4;
 scene.add(ceilingLight2);
 
-// // The number '1' is the size of the sphere
 // const lampHelper2 = new THREE.PointLightHelper(ceilingLight2, 10);
 // scene.add(lampHelper2);
 
 // --- CEILING LAMP 2 ---
-// 0xffffee is a soft indoor warm white
-const ceilingLight3 = new THREE.PointLight(0xffffee, 200, 1000); // Lower intensity needed now
+const ceilingLight3 = new THREE.PointLight(0xffffee, 200, 1000);
 ceilingLight3.position.set(-600, 50, -600);
-ceilingLight3.decay = 1; // <--- ADD THIS (Default is 2)
-ceilingLight3.distance = 1000; // Limits how far it goes
+ceilingLight3.decay = 1;
+ceilingLight3.distance = 1000;
 
-// Soften shadows for indoor lights
-ceilingLight3.shadow.radius = 4; // Makes shadow edges blurry/soft
+ceilingLight3.shadow.radius = 4;
 scene.add(ceilingLight3);
 
-// // The number '1' is the size of the sphere
 // const lampHelper3 = new THREE.PointLightHelper(ceilingLight3, 10);
 // scene.add(lampHelper3);
 
@@ -410,14 +399,10 @@ roomLoader.load('models/living_roomkitchenbedroom.glb', (gltf) => {
     const room = gltf.scene;
 
     // ADJUSTMENT 1: Scale
-    // Living room models from the internet might be huge or tiny.
-    // Adjust this until the room looks correct relative to the aquarium.
     room.scale.set(5, 5, 5);
 
 
     // ADJUSTMENT 2: Position
-    // Lower the room so the floor is below the aquarium.
-    // Since your aquarium is at (0,0,0), the floor needs to be lower (e.g., y = -10)
     room.position.set(1350, 340, -100);
 
     room.rotation.y = Math.PI / 2;
@@ -425,29 +410,9 @@ roomLoader.load('models/living_roomkitchenbedroom.glb', (gltf) => {
     // Enable shadows for the room
     room.traverse((node) => {
         if (node.isMesh) {
-            node.receiveShadow = true; // The floor/walls catch shadows
-            node.castShadow = true;    // Window frames/furniture cast shadows
+            node.receiveShadow = true;
+            node.castShadow = true;
         }
-
-        // Log both the object name AND the material name
-        // console.log("Object:", node.name, " | Material:", node.material);
-
-        // // CHECK IF THIS IS THE GLASS PART
-        // // (You might need to check the name in Blender if 'Glass' isn't in the name)
-        // if (node.name.toLowerCase().includes('glass') || node.name.toLowerCase().includes('window')) {
-        //
-        //     // 1. Make it visible from both sides
-        //     node.material.side = THREE.DoubleSide;
-        //
-        //     // 2. Make it transparent (if not already)
-        //     node.material.transparent = true;
-        //     node.material.opacity = 0.3; // Adjust transparency
-        //
-        //     // 3. THE TRICK: Add Emissive color
-        //     // This makes the glass "glow" slightly, simulating light hitting it
-        //     node.material.emissive = new THREE.Color(0xffffff);
-        //     node.material.emissiveIntensity = 0.2;
-        // }
     });
 
     scene.add(room);
