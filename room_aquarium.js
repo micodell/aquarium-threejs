@@ -873,11 +873,17 @@ function startFishSequence() {
     // 1. Zoom Out (Escape the tank)
     // Pull camera up and back to see the whole tank
     camState.x = 0; // Center X relative to tank
-    camState.y = 30; // High up (above the water/room)
+    camState.y = 20; // High up (above the water/room)
     camState.z = 200; // Far back
     camState.rotX = -0.2; // Look down slightly
     camState.rotY = 0;    // Reset rotation to look forward
     camState.rotZ = 0;    // Reset roll
+
+    // 2. Circle Around the Aquarium (Orbit)
+    // We animate a 'dummy' object (angle) from 0 to 360 (2*Math.PI)
+    // and calculate X/Z positions in the onUpdate function.
+    const orbit = { angle: 0 };
+    const radius = 200; // Distance from center
 
     tl.to(camera.position, {
         x: camState.x,
@@ -894,15 +900,7 @@ function startFishSequence() {
         z: camState.rotZ,
         duration: 5,
         ease: "power2.inOut"
-    }, "<"); // Run at same time as position move
-
-    // 2. Circle Around the Aquarium (Orbit)
-    // We animate a 'dummy' object (angle) from 0 to 360 (2*Math.PI)
-    // and calculate X/Z positions in the onUpdate function.
-    const orbit = { angle: 0 };
-    const radius = 200; // Distance from center
-
-    tl.to(orbit, {
+    }, "<").to(orbit, {
         angle: Math.PI * 2, // Full 360 circle
         duration: 15,       // Slow rotation
         ease: "none",       // Constant speed
@@ -914,11 +912,12 @@ function startFishSequence() {
             // Force camera to look at center (0,0,0)
             camera.lookAt(0, 0, 0);
         }
-    });
+    }, "<"); // Run at same time as position move
+
     tl.to(camera, {
         fov: 60, // zoom-in
         duration: 3,
-        ease: "power3.out",
+        ease: "power3.inOut",
         onUpdate: () => camera.updateProjectionMatrix()
     });
 
