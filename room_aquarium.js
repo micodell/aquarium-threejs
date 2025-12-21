@@ -13,7 +13,7 @@ scene.background = new THREE.Color(0x111111);
 const clock = new THREE.Clock();
 let mixer;
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
 camera.rotation.order = 'YXZ';
 
 // --- RENDERER SETTINGS ---
@@ -58,7 +58,7 @@ camera.position.z = target.z;
 controls.update();
 
 // --- !! LIGHTS !! ---
-const ambientLight = new THREE.AmbientLight(0x3d85c6, 0.15); // Soft black light
+const ambientLight = new THREE.AmbientLight(0x3d85c6, 1.15); // Soft black light
 scene.add(ambientLight);
 
 // Directional Light (Buat cahaya besar dari depan kaca)
@@ -323,14 +323,143 @@ const glow = new THREE.Mesh(glowGeo, glowMat);
 glow.position.set(0, 43, 0);
 glow.rotation.x = Math.PI / 2;
 scene.add(glow);
+//
+//
+// // --- GLASS DOOR LIGHT (SUN) ---
+// // 0xffdfba is a warm sunlight color
+// const sunLight = new THREE.DirectionalLight(0xffdfba, 1);
+//
+// // Position: Outside the room (e.g., x=50), shining in
+// sunLight.position.set(100, 100, 800);
+// sunLight.target.position.set(0, 0, 0); // Points to center of room
+//
+// sunLight.castShadow = true;
+//
+// // Sharpen the shadows for sunlight
+// sunLight.shadow.mapSize.width = 2048;
+// sunLight.shadow.mapSize.height = 2048;
+// sunLight.shadow.camera.near = 0.5;
+// sunLight.shadow.camera.far = 100;
+//
+// // Ensure the shadow box covers the room
+// const d2 = 50;
+// sunLight.shadow.camera.left = -d2;
+// sunLight.shadow.camera.right = d2;
+// sunLight.shadow.camera.top = d2;
+// sunLight.shadow.camera.bottom = -d2;
+//
+// scene.add(sunLight);
+// scene.add(sunLight.target);
+//
+// // The number '5' is the size of the square helper
+// const sunHelper = new THREE.DirectionalLightHelper(sunLight, 50);
+// scene.add(sunHelper);
 
+// --- CEILING LAMP 1 ---
+// 0xffffee is a soft indoor warm white
+const ceilingLight1 = new THREE.PointLight(0xffffee, 1000, 1000); // Lower intensity needed now
+ceilingLight1.position.set(450, 280, -80);
+ceilingLight1.decay = 1; // <--- ADD THIS (Default is 2)
+ceilingLight1.distance = 1000; // Limits how far it goes
+
+// Soften shadows for indoor lights
+ceilingLight1.shadow.radius = 4; // Makes shadow edges blurry/soft
+scene.add(ceilingLight1);
+
+// // The number '1' is the size of the sphere
+// const lampHelper1 = new THREE.PointLightHelper(ceilingLight1, 10);
+// scene.add(lampHelper1);
+
+
+// --- CEILING LAMP 2 ---
+// 0xffffee is a soft indoor warm white
+const ceilingLight2 = new THREE.PointLight(0xffffee, 1000, 1000); // Lower intensity needed now
+ceilingLight2.position.set(1800, 200, -120);
+ceilingLight2.decay = 1; // <--- ADD THIS (Default is 2)
+ceilingLight2.distance = 1000; // Limits how far it goes
+
+// Soften shadows for indoor lights
+ceilingLight2.shadow.radius = 4; // Makes shadow edges blurry/soft
+scene.add(ceilingLight2);
+
+// // The number '1' is the size of the sphere
+// const lampHelper2 = new THREE.PointLightHelper(ceilingLight2, 10);
+// scene.add(lampHelper2);
+
+// --- CEILING LAMP 2 ---
+// 0xffffee is a soft indoor warm white
+const ceilingLight3 = new THREE.PointLight(0xffffee, 200, 1000); // Lower intensity needed now
+ceilingLight3.position.set(-600, 50, -600);
+ceilingLight3.decay = 1; // <--- ADD THIS (Default is 2)
+ceilingLight3.distance = 1000; // Limits how far it goes
+
+// Soften shadows for indoor lights
+ceilingLight3.shadow.radius = 4; // Makes shadow edges blurry/soft
+scene.add(ceilingLight3);
+
+// // The number '1' is the size of the sphere
+// const lampHelper3 = new THREE.PointLightHelper(ceilingLight3, 10);
+// scene.add(lampHelper3);
 
 // 2. Load GLBs
+
+// 1. Load the Living Room Environment
+const roomLoader = new GLTFLoader();
+roomLoader.load('models/living_roomkitchenbedroom.glb', (gltf) => {
+    const room = gltf.scene;
+
+    // ADJUSTMENT 1: Scale
+    // Living room models from the internet might be huge or tiny.
+    // Adjust this until the room looks correct relative to the aquarium.
+    room.scale.set(5, 5, 5);
+
+
+    // ADJUSTMENT 2: Position
+    // Lower the room so the floor is below the aquarium.
+    // Since your aquarium is at (0,0,0), the floor needs to be lower (e.g., y = -10)
+    room.position.set(1350, 340, -100);
+
+    room.rotation.y = Math.PI / 2;
+
+    // Enable shadows for the room
+    room.traverse((node) => {
+        if (node.isMesh) {
+            node.receiveShadow = true; // The floor/walls catch shadows
+            node.castShadow = true;    // Window frames/furniture cast shadows
+        }
+
+        // Log both the object name AND the material name
+        // console.log("Object:", node.name, " | Material:", node.material);
+
+        // // CHECK IF THIS IS THE GLASS PART
+        // // (You might need to check the name in Blender if 'Glass' isn't in the name)
+        // if (node.name.toLowerCase().includes('glass') || node.name.toLowerCase().includes('window')) {
+        //
+        //     // 1. Make it visible from both sides
+        //     node.material.side = THREE.DoubleSide;
+        //
+        //     // 2. Make it transparent (if not already)
+        //     node.material.transparent = true;
+        //     node.material.opacity = 0.3; // Adjust transparency
+        //
+        //     // 3. THE TRICK: Add Emissive color
+        //     // This makes the glass "glow" slightly, simulating light hitting it
+        //     node.material.emissive = new THREE.Color(0xffffff);
+        //     node.material.emissiveIntensity = 0.2;
+        // }
+    });
+
+    scene.add(room);
+
+}, undefined, (error) => {
+    console.error('Error loading living room:', error);
+});
+
 const aquariumLoader = new GLTFLoader();
 aquariumLoader.load('models/room_aquarium_now_animated.glb', (gltf) => {
     const aquarium = gltf.scene;
     aquarium.position.set(0, 0, 0);
-    aquarium.scale.set(1, 1, 1); 
+    aquarium.scale.set(1, 1, 1);
 
     aquarium.traverse((node) => {
         if (node.isMesh) {
@@ -673,7 +802,7 @@ function startSwimmingLoop() {
 
 // --- KEYBOARD CONTROLS SETUP ---
 const keyState = {};
-const moveSpeed = 0.5; // Walk speed
+const moveSpeed = 10; // Walk speed
 const turnSpeed = 0.01; // Look speed (how fast you turn)
 
 window.addEventListener('keydown', (event) => {
@@ -687,7 +816,7 @@ window.addEventListener('keyup', (event) => {
 function updateMovement() {
     const forward = new THREE.Vector3();
     camera.getWorldDirection(forward);
-    forward.y = 0; 
+    forward.y = 0;
     forward.normalize();
 
     const right = new THREE.Vector3();
@@ -725,8 +854,9 @@ function animate() {
     camera.getWorldDirection(forward);
     controls.target.copy(camera.position).add(forward.multiplyScalar(10));
 
-    // updateMovement();
-    // controls.update();
+    updateMovement();
+
+    controls.update();
     renderer.render(scene, camera);
 }
 animate();
