@@ -464,8 +464,69 @@ aquariumLoader.load('models/room_aquarium_now_animated.glb', (gltf) => {
 
     aquarium.traverse((node) => {
         if (node.isMesh) {
-            node.castShadow = true;    // The object throws a shadow
-            node.receiveShadow = true; // The object can have shadows fall on it
+            
+            console.log(node.name);
+
+            if (node.name.toLowerCase().includes('bubles')) {
+                node.material.transparent = true;
+                node.material.opacity = 0.5;
+                node.material.depthWrite = false; 
+                node.material.side = THREE.DoubleSide; 
+                node.castShadow = false; // agar tidak terlihat seperti benda padat
+                node.receiveShadow = false;
+            } else if (node.material.name.toLowerCase().includes('glass')) {
+                node.material.transparent = true;
+                node.material.opacity = 0.2;
+                node.castShadow = false;
+                node.receiveShadow = true;
+            } else if (node.material.name.toLowerCase().includes('grass') || node.material.name.toLowerCase().includes('green')) {
+                // Contoh warna rumput alami:
+                // 0x3e5c28 (Hijau tua hutan - Recommended)
+                // 0x5a7d3a (Hijau lumut agak terang)
+                // 0x2f451e (Sangat gelap)
+                node.material.color.setHex(0x3e5c28);
+                node.material.roughness = 0.9;
+                node.material.metalness = 0.0;
+                node.material.envMapIntensity = 0.5;
+
+                node.castShadow = false;
+                node.receiveShadow = true;
+            } else if (node.material.name.toLowerCase().includes('blue_algae')) {
+                node.material.color.setHex(0xb84c77);
+                node.material.roughness = 0.9;
+                node.material.metalness = 0.0;
+                node.material.envMapIntensity = 0.5;
+
+                node.castShadow = true;
+                node.receiveShadow = true;
+            } else if (node.material.name.toLowerCase().includes('feed_feed')) {
+                node.material.color.setHex(0xb02815);
+                node.material.roughness = 0.9;
+                node.material.metalness = 0.0;
+                node.material.envMapIntensity = 0.5;
+
+                node.castShadow = false;
+                node.receiveShadow = true;
+            } else if (node.material.name.toLowerCase().includes('feeder')) {
+                node.material.color.setHex(0x7876d1);
+                node.material.roughness = 0.9;
+                node.material.metalness = 0.0;
+                node.material.envMapIntensity = 0.5;
+
+                node.castShadow = false;
+                node.receiveShadow = true;
+            } else if (node.material.name.toLowerCase().includes('stone')) {
+                node.material.color.setHex(0x99a5b4);
+                node.material.roughness = 0.9;
+                node.material.metalness = 0.0;
+                node.material.envMapIntensity = 0.1;
+
+                node.castShadow = true;
+                node.receiveShadow = true;
+            } else {
+                node.castShadow = true;
+                node.receiveShadow = true;
+            }
         }
     });
 
@@ -812,9 +873,9 @@ function startFishSequence() {
     // 1. Zoom Out (Escape the tank)
     // Pull camera up and back to see the whole tank
     camState.x = 0; // Center X relative to tank
-    camState.y = 40; // High up (above the water/room)
+    camState.y = 30; // High up (above the water/room)
     camState.z = 200; // Far back
-    camState.rotX = -0.3; // Look down slightly
+    camState.rotX = -0.2; // Look down slightly
     camState.rotY = 0;    // Reset rotation to look forward
     camState.rotZ = 0;    // Reset roll
 
@@ -853,6 +914,12 @@ function startFishSequence() {
             // Force camera to look at center (0,0,0)
             camera.lookAt(0, 0, 0);
         }
+    });
+    tl.to(camera, {
+        fov: 60, // zoom-in
+        duration: 3,
+        ease: "power3.out",
+        onUpdate: () => camera.updateProjectionMatrix()
     });
 
     
