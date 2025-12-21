@@ -3,7 +3,8 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import gsap from 'gsap';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-
+import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
+RectAreaLightUniformsLib.init();
 
 // 1. Setup Scene and Clock for animation :)
 const scene = new THREE.Scene();
@@ -61,7 +62,7 @@ const ambientLight = new THREE.AmbientLight(0x3d85c6, 0.15); // Soft black light
 scene.add(ambientLight);
 
 // Directional Light (Buat cahaya besar dari depan kaca)
-const dirLight = new THREE.DirectionalLight(0x9fc5e8, 1); // Increase intensity to 2
+const dirLight = new THREE.DirectionalLight(0x9fc5e8, 0.3); // Increase intensity to 2
 dirLight.position.set(0, 20, 60); // Cahaya dari kaca depan aquarium
 dirLight.target.position.set(0, 2, -20); // Pointing to inside the aquarium
 dirLight.castShadow = true; // <--- LIGHT MUST CAST SHADOW
@@ -90,8 +91,8 @@ spotLight.shadow.mapSize.set(2048, 2048);
 spotLight.shadow.camera.near = 10;
 spotLight.shadow.camera.far = 120;
 spotLight.shadow.bias = -0.0005; // Reduce shadow acne
-const spothelper = new THREE.DirectionalLightHelper( spotLight, 20 );
-scene.add( spothelper );
+// const spothelper = new THREE.DirectionalLightHelper( spotLight, 20 );
+// scene.add( spothelper );
 
 const s = 15;
 spotLight.shadow.camera.left = -s;
@@ -188,21 +189,134 @@ const centerLight = new THREE.PointLight(0xffffff, 150, 240); // White light, in
 centerLight.position.set(-60, -20, -10); // Hanging 2 meters in the air
 scene.add(centerLight);
 // helper
-const pointLightHelper = new THREE.PointLightHelper(centerLight, 5);
-scene.add(pointLightHelper);
+// const pointLightHelper = new THREE.PointLightHelper(centerLight, 5);
+// scene.add(pointLightHelper);
 
-scene.fog = new THREE.Fog(
-    0x0b1e2d,  // warna air gelap
-    -30,        // mulai
-    150         // habis
+// scene.fog = new THREE.Fog(
+//     0x0b1e2d,  // warna air gelap
+//     -30,        // mulai
+//     150         // habis
+// );
+
+// Stripe Light (LED aquarium)
+const stripeLight = new THREE.RectAreaLight(
+    0x9fe7ff,   // warna LED aquarium
+    15,         // intensity (besar tapi lembut)
+    60,         // width (panjang aquarium)
+    6           // height (tebal lampu)
 );
+
+// posisi tepat di atas air
+stripeLight.position.set(0, 45, 34);
+stripeLight.rotation.x = -Math.PI / 2; // menghadap ke bawah
+
+scene.add(stripeLight);
+
+// Glow Stripe
+const stripeGlowGeo = new THREE.PlaneGeometry(180, 2);
+const stripeGlowMat = new THREE.MeshBasicMaterial({
+    color: 0x9fe7ff,
+    transparent: true,
+    opacity: 1
+});
+
+const stripeGlow = new THREE.Mesh(stripeGlowGeo, stripeGlowMat);
+stripeGlow.position.set(0, 45, 34);
+stripeGlow.rotation.x = Math.PI / 2;
+
+scene.add(stripeGlow);
+
+// Stripe Light (LED aquarium)
+const stripeLight2 = new THREE.RectAreaLight(
+    0x9fe7ff,   // warna LED aquarium
+    15,         // intensity (besar tapi lembut)
+    60,         // width (panjang aquarium)
+    6           // height (tebal lampu)
+);
+
+// posisi tepat di atas air
+stripeLight2.position.set(0, 44, 22);
+stripeLight2.rotation.x = -Math.PI / 2; // menghadap ke bawah
+
+scene.add(stripeLight);
+
+// Glow Stripe
+const stripeGlowGeo2 = new THREE.PlaneGeometry(180, 2);
+const stripeGlowMat2 = new THREE.MeshBasicMaterial({
+    color: 0x9fe7ff,
+    transparent: true,
+    opacity: 1
+});
+
+const stripeGlow2 = new THREE.Mesh(stripeGlowGeo2, stripeGlowMat2);
+stripeGlow2.position.set(0, 45, 22);
+stripeGlow2.rotation.x = Math.PI / 2;
+
+scene.add(stripeGlow2);
+
+// Stripe Light (LED aquarium)
+const stripeLight3 = new THREE.RectAreaLight(
+    0x9fe7ff,   // warna LED aquarium
+    15,         // intensity (besar tapi lembut)
+    60,         // width (panjang aquarium)
+    6           // height (tebal lampu)
+);
+
+// posisi tepat di atas air
+stripeLight3.position.set(0, 45, -24);
+stripeLight3.rotation.x = -Math.PI / 2; // menghadap ke bawah
+
+scene.add(stripeLight3);
+
+// Glow Stripe
+const stripeGlowGeo3 = new THREE.PlaneGeometry(180, 2);
+const stripeGlowMat3 = new THREE.MeshBasicMaterial({
+    color: 0x9fe7ff,
+    transparent: true,
+    opacity: 1
+});
+
+const stripeGlow3 = new THREE.Mesh(stripeGlowGeo3, stripeGlowMat3);
+stripeGlow3.position.set(0, 45, -24);
+stripeGlow3.rotation.x = Math.PI / 2;
+
+scene.add(stripeGlow3);
+
+// Stripe Light (LED aquarium)
+const stripeLight4 = new THREE.RectAreaLight(
+    0x9fe7ff,   // warna LED aquarium
+    15,         // intensity (besar tapi lembut)
+    60,         // width (panjang aquarium)
+    6           // height (tebal lampu)
+);
+
+// posisi tepat di atas air
+stripeLight4.position.set(0, 45, -36);
+stripeLight4.rotation.x = -Math.PI / 2; // menghadap ke bawah
+
+scene.add(stripeLight4);
+
+// Glow Stripe
+const stripeGlowGeo4 = new THREE.PlaneGeometry(180, 2);
+const stripeGlowMat4 = new THREE.MeshBasicMaterial({
+    color: 0x9fe7ff,
+    transparent: true,
+    opacity: 1
+});
+
+const stripeGlow4 = new THREE.Mesh(stripeGlowGeo4, stripeGlowMat4);
+stripeGlow4.position.set(0, 45, -36);
+stripeGlow4.rotation.x = Math.PI / 2;
+
+scene.add(stripeGlow4);
+
 
 // Glow
 const glowGeo = new THREE.PlaneGeometry(30, 4);
 const glowMat = new THREE.MeshBasicMaterial({
     color: 0x8fdcff,
     transparent: true,
-    opacity: 90
+    opacity: 1
 });
 
 const glow = new THREE.Mesh(glowGeo, glowMat);
@@ -604,6 +718,8 @@ function animate() {
     if (mixer) {
         mixer.update(delta);
     }
+
+    
 
     const forward = new THREE.Vector3();
     camera.getWorldDirection(forward);
